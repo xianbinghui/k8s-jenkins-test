@@ -1,0 +1,73 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: k8s-cicd-test
+  labels:
+    app: k8s-cicd-test
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: k8s-cicd-test
+    spec:
+      nodeSelector:
+        node: k8s-node
+      containers:
+      - name: k8s-cicd-test
+        image: __IMAGE__
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 32m
+            memory: 32Mi
+          requests:
+            cpu: 1m
+            memory: 1Mi
+        ports:
+        - name: k8s-cicd-test
+          containerPort: 80
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-cicd-test
+  labels:
+    app: k8s-cicd-test
+spec:
+  ports:
+  - name: k8s-cicd-test
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  selector:
+    app: k8s-cicd-test
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: k8s-cicd-test
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: k8s-jenkins.xbh.cn
+    http:
+      paths:
+      - backend:
+          serviceName: k8s-cicd-test
+          servicePort: 80
