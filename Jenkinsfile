@@ -26,5 +26,5 @@ node {
     stage "Deploy"
 
         sh "sed 's#__IMAGE__#'$BUILDIMG'#' applications/k8s-cicd-nginx-test/k8s/deployment.yaml | kubectl --kubeconfig ${kubeconfig} apply -f -"
-        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/k8s-cicd-nginx-test"
+        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/${appName}"
 }
