@@ -12,19 +12,19 @@ node {
     imageName = "${registryHost}${appName}:${tag}"
     env.BUILDIMG=imageName
 
-    kubeconfig = "--kubeconfig=/etc/kubeconfig/kubeconfig"
-    dockerconfig = "--config /etc/dockerconfig/docker-config.json"
+    kubeconfig = "/etc/kubeconfig/config"
+    dockerconfig = "/etc/dockerconfig"
 
     stage "Build"
     
-        sh "docker ${dockerconfig} build -t ${imageName} -f applications/k8s-cicd-nginx-test/Dockerfile applications/k8s-cicd-nginx-test"
+        sh "docker --config ${dockerconfig} build -t ${imageName} -f applications/k8s-cicd-nginx-test/Dockerfile applications/k8s-cicd-nginx-test"
 
     stage "Push"
 
-        sh "docker ${dockerconfig}  push ${imageName}"
+        sh "docker --config ${dockerconfig}  push ${imageName}"
 
     stage "Deploy"
 
-        sh "sed 's#__IMAGE__#'$BUILDIMG'#' applications/k8s-cicd-nginx-test/k8s/deployment.yaml | kubectl ${kubeconfig} apply -f -"
-        sh "kubectl ${kubeconfig} rollout status deployment/k8s-cicd-nginx-test"
+        sh "sed 's#__IMAGE__#'$BUILDIMG'#' applications/k8s-cicd-nginx-test/k8s/deployment.yaml | kubectl --kubeconfig ${kubeconfig} apply -f -"
+        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/k8s-cicd-nginx-test"
 }
