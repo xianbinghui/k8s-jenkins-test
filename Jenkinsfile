@@ -14,7 +14,7 @@ node {
 
     kubeconfig = "/etc/kubeconfig/config"
     dockerconfig = "/etc/dockerconfig"
-    deployment-name = "cicd-nginx-test"
+    deployname = "cicd-nginx-test"
 
     stage "Build"
     
@@ -27,5 +27,5 @@ node {
     stage "Deploy"
 
         sh "sed 's#__IMAGE__#'$BUILDIMG'#' applications/k8s-cicd-nginx-test/k8s/deployment.yaml | kubectl --kubeconfig ${kubeconfig} apply -f -"
-        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/${deployment-name}"
+        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/${deployname}"
 }
