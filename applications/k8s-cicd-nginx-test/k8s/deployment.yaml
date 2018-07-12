@@ -2,11 +2,11 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: k8s-cicd-nginx-test
+  name: cicd-nginx-test
   labels:
-    app: k8s-cicd-nginx-test
+    app: cicd-nginx-test
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,12 +15,12 @@ spec:
   template:
     metadata:
       labels:
-        app: k8s-cicd-nginx-test
+        app: cicd-nginx-test
     spec:
       nodeSelector:
         node: k8s-node
       containers:
-      - name: k8s-cicd-nginx-test
+      - name: cicd-nginx-test
         image: __IMAGE__
         imagePullPolicy: IfNotPresent
         resources:
@@ -31,7 +31,7 @@ spec:
             cpu: 1m
             memory: 1Mi
         ports:
-        - name: k8s-cicd-nginx-test
+        - name: cicd-nginx-test
           containerPort: 80
         volumeMounts:
         - name: localtime
@@ -45,22 +45,22 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-cicd-nginx-test
+  name: cicd-nginx-test
   labels:
-    app: k8s-cicd-nginx-test
+    app: cicd-nginx-test
 spec:
   ports:
-  - name: k8s-cicd-nginx-test
+  - name: cicd-nginx-test
     protocol: TCP
     port: 80
     targetPort: 80
   selector:
-    app: k8s-cicd-nginx-test
+    app: cicd-nginx-test
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: k8s-cicd-nginx-test
+  name: cicd-nginx-test
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
@@ -69,5 +69,5 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: k8s-cicd-nginx-test
+          serviceName: cicd-nginx-test
           servicePort: 80

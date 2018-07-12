@@ -7,13 +7,14 @@ node {
     sh "git rev-parse --short HEAD > commit-id"
 
     tag = readFile('commit-id').replace("\n", "").replace("\r", "")
-    appName = "k8s-cicd-nginx-test"
+    appName = "cicd"
     registryHost = "docker.io/xianbinghui/"
     imageName = "${registryHost}${appName}:${tag}"
     env.BUILDIMG=imageName
 
     kubeconfig = "/etc/kubeconfig/config"
     dockerconfig = "/etc/dockerconfig"
+    deployment-name = "cicd-nginx-test"
 
     stage "Build"
     
@@ -26,5 +27,5 @@ node {
     stage "Deploy"
 
         sh "sed 's#__IMAGE__#'$BUILDIMG'#' applications/k8s-cicd-nginx-test/k8s/deployment.yaml | kubectl --kubeconfig ${kubeconfig} apply -f -"
-        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/${appName}"
+        sh "kubectl --kubeconfig ${kubeconfig} rollout status deployment/${deployment-name}"
 }
